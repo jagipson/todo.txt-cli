@@ -717,13 +717,18 @@ _list() {
                 gsub(/\\+033/, "\033", color)
                 return color
             }
+            function tagcolor(text, origColor) {
+                gsub(/\+\w+/, highlight("COLOR_PROJ")"&"origColor, text)
+                gsub(/\@\w+/, highlight("COLOR_CNTX")"&"origColor, text)
+                return text
+            }
             {
                 pos = match($0, /\([A-Z]\)/)
                 if (match($0, /^[0-9]+ x /)) {
-                    print highlight("COLOR_DONE") $0 highlight("DEFAULT")
+                  print highlight("COLOR_DONE") tagcolor($0, highlight("COLOR_DONE")) highlight("DEFAULT")
                 } else if (pos > 0) {
                     clr = highlight("PRI_" substr($0, pos+1, 1))
-                    print ( clr ? clr : highlight("PRI_X") ) $0 highlight("DEFAULT")
+                    print ( clr ? clr : highlight("PRI_X") ) tagcolor($0, ( clr ? clr : highlight("PRI_X") )) highlight("DEFAULT")
                 } else { print }
             }
           '''  \
